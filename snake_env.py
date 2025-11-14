@@ -20,10 +20,12 @@ class SnakeEnv(gym.Env):
         self.game = SnakeGame(width=width, height=height)
 
         # Define action and observation space
-        # Actions: 4 directions (up, right, down, left)
-        self.action_space = spaces.Discrete(4)
+        # Actions: 3 relative directions (continue straight, turn right, turn left)
+        self.action_space = spaces.Discrete(3)
 
         # Observation space: 25 grid cells (0-3) + 4 direction (0-1) + 4 food direction (0-1)
+        # Grid cells can be 0-3, direction and food direction are 0-1
+        # We use high=3 to cover all possible values in the observation
         self.observation_space = spaces.Box(
             low=0, high=3, shape=(33,), dtype=np.float32
         )

@@ -99,11 +99,15 @@ uv run python train_snake.py play snake_model 10
 - **Direction (4)**: Current direction (up, right, down, left) - one-hot encoded
 - **Food Direction (4)**: Global food location relative to head (up, down, left, right)
 
-### Action Space (4 actions)
-- **0**: Up
-- **1**: Right
-- **2**: Down
-- **3**: Left
+### Action Space (3 actions - Relative Turns)
+- **0**: Continue straight (no turn)
+- **1**: Turn right (clockwise 90°)
+- **2**: Turn left (counter-clockwise 90°)
+
+The snake uses relative actions instead of absolute directions because:
+- More intuitive for the agent to learn (snake can't reverse direction)
+- Reduces action space complexity
+- All possible moves are covered with just 3 actions
 
 ### Reward System
 - **+10**: Eating food

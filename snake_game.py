@@ -114,7 +114,13 @@ class SnakeGame:
         return self._get_observation(), reward, terminated, False, {"score": self.score}
 
     def _update_direction(self, action):
-        """Update direction based on action"""
+        """
+        Update direction based on action (relative turns)
+        Action space: 3 actions
+        - 0: Continue straight (no turn)
+        - 1: Turn right (clockwise 90°)
+        - 2: Turn left (counter-clockwise 90°)
+        """
         if action == 0:  # Continue straight
             return
 
@@ -125,6 +131,9 @@ class SnakeGame:
             self.direction = directions[(current_idx + 1) % 4]
         elif action == 2:  # Turn left
             self.direction = directions[(current_idx - 1) % 4]
+        else:
+            # Invalid action - should not happen with Discrete(3) action space
+            raise ValueError(f"Invalid action: {action}. Expected 0, 1, or 2.")
 
     def _get_observation(self):
         """Get current state observation for RL"""
