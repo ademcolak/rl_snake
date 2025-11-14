@@ -90,13 +90,14 @@ uv run python train_snake.py play snake_model 10
 
 ## Environment Details
 
-### State Space (29 dimensions)
+### State Space (33 dimensions)
 - **Local Grid Vision (25)**: 5x5 grid around snake head
   - 0 = Empty space
   - 1 = Wall/boundary
   - 2 = Snake body
   - 3 = Food
 - **Direction (4)**: Current direction (up, right, down, left) - one-hot encoded
+- **Food Direction (4)**: Global food location relative to head (up, down, left, right)
 
 ### Action Space (4 actions)
 - **0**: Up
@@ -107,8 +108,8 @@ uv run python train_snake.py play snake_model 10
 ### Reward System
 - **+10**: Eating food
 - **-10**: Game over (collision)
-- **+1**: Moving closer to food (distance-based shaping)
-- **-1**: Moving away from food (distance-based shaping)
+- **+0.1**: Moving closer to food (distance-based shaping)
+- **-0.1**: Moving away from food (distance-based shaping)
 
 ## Files Explained
 

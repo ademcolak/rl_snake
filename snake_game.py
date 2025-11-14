@@ -107,9 +107,9 @@ class SnakeGame:
             new_distance = abs(new_head[0] - self.food[0]) + abs(new_head[1] - self.food[1])
 
             if new_distance < old_distance:
-                reward = 1
+                reward = 0.1
             else:
-                reward = -1
+                reward = -0.1
 
         return self._get_observation(), reward, terminated, False, {"score": self.score}
 
@@ -129,7 +129,7 @@ class SnakeGame:
     def _get_observation(self):
         """Get current state observation for RL"""
         if not self.snake:
-            return np.zeros(29, dtype=np.float32)
+            return np.zeros(33, dtype=np.float32)
 
         head = self.snake[0]
         head_x, head_y = head
@@ -156,7 +156,15 @@ class SnakeGame:
         directions = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]
         dir_encoded = [1 if self.direction == d else 0 for d in directions]
 
-        observation = np.array(local_grid + dir_encoded, dtype=np.float32)
+        food_up = 1 if self.food[1] < head_y else 0
+        food_down = 1 if self.food[1] > head_y else 0
+        food_left = 1 if self.food[0] < head_x else 0
+        food_right = 1 if self.food[0] > head_x else 0
+
+        observation = np.array(
+            local_grid + dir_encoded + [food_up, food_down, food_left, food_right],
+            dtype=np.float32
+        )
 
         return observation
 
