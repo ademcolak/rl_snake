@@ -23,9 +23,9 @@ class SnakeEnv(gym.Env):
         # Actions: 4 directions (up, right, down, left)
         self.action_space = spaces.Discrete(4)
 
-        # Observation space: 11 boolean/binary features
+        # Observation space: 25 grid cells (0-3) + 4 direction features (0-1)
         self.observation_space = spaces.Box(
-            low=0, high=1, shape=(11,), dtype=np.float32
+            low=0, high=3, shape=(29,), dtype=np.float32
         )
 
         # Initialize pygame if render mode is human

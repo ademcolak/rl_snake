@@ -62,6 +62,8 @@ class SnakeGame:
         # Move snake
         head_x, head_y = self.snake[0]
 
+        old_distance = abs(head_x - self.food[0]) + abs(head_y - self.food[1])
+
         # Calculate new head position
         if self.direction == Direction.UP:
             new_head = (head_x, head_y - 1)
@@ -100,7 +102,14 @@ class SnakeGame:
             reward = 10
             self.food = self._generate_food()
         else:
-            self.snake.pop()  # Remove tail if no food eaten
+            self.snake.pop()
+
+            new_distance = abs(new_head[0] - self.food[0]) + abs(new_head[1] - self.food[1])
+
+            if new_distance < old_distance:
+                reward = 1
+            else:
+                reward = -1
 
         return self._get_observation(), reward, terminated, False, {"score": self.score}
 
@@ -120,36 +129,34 @@ class SnakeGame:
     def _get_observation(self):
         """Get current state observation for RL"""
         if not self.snake:
-            return np.zeros(11, dtype=np.float32)
+            return np.zeros(29, dtype=np.float32)
 
         head = self.snake[0]
+        head_x, head_y = head
 
-        # Get danger in each direction relative to current direction
+        grid_size = 5
+        grid_radius = grid_size // 2
+
+        local_grid = []
+
+        for dy in range(-grid_radius, grid_radius + 1):
+            for dx in range(-grid_radius, grid_radius + 1):
+                x = head_x + dx
+                y = head_y + dy
+
+                if x < 0 or x >= self.width or y < 0 or y >= self.height:
+                    local_grid.append(1)
+                elif (x, y) in self.snake:
+                    local_grid.append(2)
+                elif (x, y) == self.food:
+                    local_grid.append(3)
+                else:
+                    local_grid.append(0)
+
         directions = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]
-        current_dir_idx = directions.index(self.direction)
+        dir_encoded = [1 if self.direction == d else 0 for d in directions]
 
-        # Check danger: straight, right, left
-        danger_straight = self._is_collision(head, self.direction)
-        danger_right = self._is_collision(head, directions[(current_dir_idx + 1) % 4])
-        danger_left = self._is_collision(head, directions[(current_dir_idx - 1) % 4])
-
-        # Direction booleans
-        dir_up = self.direction == Direction.UP
-        dir_right = self.direction == Direction.RIGHT
-        dir_down = self.direction == Direction.DOWN
-        dir_left = self.direction == Direction.LEFT
-
-        # Food location relative to head
-        food_up = self.food[1] < head[1]
-        food_down = self.food[1] > head[1]
-        food_left = self.food[0] < head[0]
-        food_right = self.food[0] > head[0]
-
-        observation = np.array([
-            danger_straight, danger_right, danger_left,
-            dir_up, dir_right, dir_down, dir_left,
-            food_up, food_down, food_left, food_right
-        ], dtype=np.float32)
+        observation = np.array(local_grid + dir_encoded, dtype=np.float32)
 
         return observation
 

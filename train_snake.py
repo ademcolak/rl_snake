@@ -1,6 +1,7 @@
 # train_snake.py
 from stable_baselines3 import PPO
 from snake_env import SnakeEnv
+import torch.nn as nn
 
 def train_snake(timesteps=100000, render=False):
     """Train Snake AI with PPO"""
@@ -14,6 +15,11 @@ def train_snake(timesteps=100000, render=False):
     env = SnakeEnv(render_mode=render_mode)
 
     # Create PPO model
+    policy_kwargs = dict(
+        net_arch=dict(pi=[256, 256, 128], vf=[256, 256, 128]),
+        activation_fn=nn.ReLU
+    )
+
     model = PPO(
         "MlpPolicy",
         env,
@@ -22,6 +28,8 @@ def train_snake(timesteps=100000, render=False):
         n_steps=2048,
         batch_size=64,
         gamma=0.99,
+        policy_kwargs=policy_kwargs,
+        ent_coef=0.01,
     )
 
     # Train the model
